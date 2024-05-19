@@ -128,14 +128,14 @@ const DriverPage = () => {
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
           <Tabs defaultValue="all">
             <div className="flex items-center">
-              <h1 className="font-bold text-2xl">Approved Driver List</h1>
+              <h1 className="font-bold text-2xl">Driver Request List</h1>
               <div className="ml-auto flex items-center gap-2">
-                <Button size="sm" variant="outline" className="h-7 gap-1">
+                {/* <Button size="sm" variant="outline" className="h-7 gap-1">
                   <File className="h-3.5 w-3.5" />
                   <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                     Export Details
                   </span>
-                </Button>
+                </Button> */}
               </div>
             </div>
             <TabsContent value="all">
@@ -143,7 +143,7 @@ const DriverPage = () => {
                 <CardContent>
                   <ScrollArea className="h-[480px] w-full overflow-y-auto">
                     <Table>
-                      <TableHeader className="bg-slate-100 py-4">
+                      <TableHeader className="bg-slate-100 py-4 text-black dark:text-black ">
                         <TableRow>
                           <TableHead style={{ whiteSpace: "nowrap" }}>
                             Sr.No

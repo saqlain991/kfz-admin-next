@@ -30,10 +30,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { File, ListFilter, MoreHorizontal, PlusCircle } from "lucide-react";
+import {
+  File,
+  ListFilter,
+  MoreHorizontal,
+  PlusCircle,
+  Search,
+} from "lucide-react";
 import Image from "next/image";
 import React from "react";
 import Link from "next/link";
+import { Input } from "@/components/ui/input";
 
 const DriverPage = () => {
   const customerData = [
@@ -137,7 +144,21 @@ const DriverPage = () => {
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
           <Tabs defaultValue="all">
             <div className="flex items-center">
-              <h1 className="font-bold text-2xl">All Driver Details</h1>
+              <div className="flex gap-10 w-full">
+                <h1 className="font-bold text-2xl">All Driver Details</h1>
+                {/* <div className="w-full flex-1">
+                  <form>
+                    <div className="relative">
+                      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        type="search"
+                        placeholder="Search Driver..."
+                        className="w-full appearance-none bg-background pl-8 shadow-none md:w-2/3 lg:w-1/3"
+                      />
+                    </div>
+                  </form>
+                </div> */}
+              </div>
               <div className="ml-auto flex items-center gap-2">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

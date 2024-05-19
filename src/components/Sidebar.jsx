@@ -55,9 +55,9 @@ const Sidebar = () => {
       url: "/payment",
     },
     {
-      name: "Driver Approved Details",
+      name: "Driver Request List",
       icons: <UserCheck />,
-      url: "/driver-approved",
+      url: "/driver/driver-request",
     },
     {
       name: "Notification ",
