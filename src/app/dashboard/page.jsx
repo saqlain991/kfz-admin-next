@@ -83,7 +83,7 @@ const Dashboard = () => {
                 title: element.title,
                 icons: <CreditCardIcon />,
                 value: element.value,
-                url: "/dashboard/order",
+                url: "/dashboard/payment",
               };
 
               dashboardArray.push(obj);
@@ -94,7 +94,7 @@ const Dashboard = () => {
                 title: element.title,
                 icons: <Users />,
                 value: element.value,
-                url: "/dashboard/order",
+                url: "/dashboard/customer",
               };
 
               dashboardArray.push(obj);
@@ -105,7 +105,7 @@ const Dashboard = () => {
                 title: element.title,
                 icons: <Car />,
                 value: element.value,
-                url: "/dashboard/order",
+                url: "/dashboard/driver",
               };
 
               dashboardArray.push(obj);
