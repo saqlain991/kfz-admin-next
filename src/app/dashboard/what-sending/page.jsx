@@ -38,7 +38,7 @@ const WhatSendingPage = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  });
 
   const fetchData = async () => {
     try {
