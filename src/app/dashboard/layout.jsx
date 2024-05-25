@@ -1,6 +1,7 @@
 import { Inter } from "next/font/google";
-import "./globals.css";
-import { ThemeProvider } from "next-themes";
+import Sidebar from "@/components/Sidebar";
+import Header from "@/components/Header";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,7 +22,11 @@ export default function RootLayout({ children }) {
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <Sidebar />
+          <main className="w-full h-full overflow-auto">
+            <Header />
+            {children}
+          </main>
         </ThemeProvider>
       </body>
     </html>

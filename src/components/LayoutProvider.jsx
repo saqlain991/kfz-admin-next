@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { RootLayout } from "@/app/layout";
+import { RootLayout } from "@/app/dashboard/layout";
 
 export default function LayoutProvider({ children }) {
   const router = useRouter();

@@ -36,72 +36,77 @@ const Sidebar = () => {
     {
       name: "Order Details",
       icons: <ShoppingCart />,
-      url: "/order",
+      url: "/dashboard/order",
     },
     {
       name: "Customer Details",
       icons: <Users />,
-      url: "/customer",
+      url: "/dashboard/customer",
     },
     {
       name: "Driver Details",
       icons: <Car />,
-      url: "/driver",
+      url: "/dashboard/driver",
     },
 
     {
       name: "Payment Details",
       icons: <CreditCard />,
-      url: "/payment",
+      url: "/dashboard/payment",
     },
     {
       name: "Driver Request List",
       icons: <UserCheck />,
-      url: "/driver/driver-request",
+      url: "/dashboard/driver/driver-request",
     },
     {
       name: "Notification ",
       icons: <BellDot />,
-      url: "/notification",
+      url: "/dashboard/notification",
     },
     {
-      name: "Package Type Details",
+      name: "What Sending List",
       icons: <Package />,
-      url: "/package-type",
+      url: "/dashboard/what-sending",
     },
+    // {
+    //   name: "Location",
+    //   icons: <MapPin />,
+    //   url: "/dashboard/location",
+    // },
     {
-      name: "Location",
-      icons: <MapPin />,
-      url: "/location",
-    },
-    {
-      name: "Offer Details",
+      name: "Offers",
       icons: <TicketPercent />,
-      url: "/offer-details",
+      url: "/dashboard/offer-details",
     },
     {
-      name: "Employee Details",
+      name: "Admins",
       icons: <BriefcaseBusiness />,
-      url: "/employee",
-      submenu: true,
-      subMenuItems: [
-        { name: "View Employee", url: "/employee", icons: <Eye /> },
-        {
-          name: "Add Employee",
-          url: "/employee/add-employee",
-          icons: <UserPlus />,
-        },
-      ],
+      url: "/dashboard/admins",
     },
+    // {
+    //   name: "Employee Details",
+    //   icons: <BriefcaseBusiness />,
+    //   url: "/dashboard/employee",
+    //   submenu: true,
+    //   subMenuItems: [
+    //     { name: "View Employee", url: "/dashboard/employee", icons: <Eye /> },
+    //     {
+    //       name: "Add Employee",
+    //       url: "/dashboard/employee/add-employee",
+    //       icons: <UserPlus />,
+    //     },
+    //   ],
+    // },
     {
       name: "Help & Support",
       icons: <Headset />,
-      url: "/help",
+      url: "/dashboard/help",
     },
     {
       name: "Restricted Item List",
       icons: <Ban />,
-      url: "/restricted-item",
+      url: "/dashboard/restricted-item",
     },
   ];
 
@@ -132,7 +137,7 @@ const Sidebar = () => {
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
             <Link href="/" className="flex items-center gap-2 font-semibold">
               <Package2 className="h-6 w-6" />
-              <span className="">KFZ Relocation </span>
+              <span className="">KFZ Admin Panel </span>
             </Link>
           </div>
           <div className="flex-1 overflow-auto">
