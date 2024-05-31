@@ -19,7 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { MoreHorizontal, PlusCircle, Search } from "lucide-react";
+import { MoreHorizontal, Search, PlusCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -27,27 +27,69 @@ import { Button } from "@/components/ui/button";
 const WhatSendingPage = () => {
   const [whatSendingData, setWhatSendingData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentItem, setCurrentItem] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    id: "",
+    name: "",
+    status: "",
+  });
   const itemsPerPage = 10;
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   const fetchData = async () => {
     try {
       const response = await axios.get("/api/get-what-sending");
-      console.log("Response data:", response.data); // Log response data
-      setWhatSendingData(response.data.data); // Assuming the data is inside the 'data' property
+      setWhatSendingData(response.data.data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
 
   const totalPages = Math.ceil(whatSendingData.length / itemsPerPage);
+
+  const handleEditClick = (item) => {
+    setIsEditing(true);
+    setCurrentItem(item);
+    setEditFormData({ id: item.id, name: item.name, status: item.status });
+    console.log("jack Here", currentItem);
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData({ ...editFormData, [name]: value });
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.put(
+        `/api/what-sending/${editFormData.id}`,
+        editFormData
+      );
+      console.log("Updated data:", response.data);
+      setWhatSendingData(
+        whatSendingData.map((item) =>
+          item.id === editFormData.id ? editFormData : item
+        )
+      );
+      setIsEditing(false);
+      setCurrentItem(null);
+    } catch (error) {
+      console.error("Error updating data:", error);
+    }
+  };
+
+  const handleDeleteClick = (id) => {
+    setWhatSendingData(whatSendingData.filter((item) => item.id !== id));
+  };
 
   // Function to format date as ddmmyyyy
   const formatDate = (dateString) => {
@@ -126,28 +168,21 @@ const WhatSendingPage = () => {
                               {item.name}
                             </TableCell>
                             <TableCell className="font-medium p-2">
-                              {item.status}
+                              <label class="inline-flex items-center cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  value=""
+                                  class="sr-only peer"
+                                  checked={item.status ? true : false}
+                                />
+                                <div class="relative w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                              </label>
                             </TableCell>
-
                             <TableCell className="font-medium p-2">
                               {formatDate(item.created_at)}
                             </TableCell>
                             <TableCell>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <button
-                                    aria-haspopup="true"
-                                    className="text-blue-500"
-                                  >
-                                    <MoreHorizontal className="h-4 w-4" />
-                                    <span className="sr-only">Toggle menu</span>
-                                  </button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem>Edit</DropdownMenuItem>
-                                  <DropdownMenuItem>Delete</DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
+                              <Button variant="outline">Delete</Button>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -175,6 +210,59 @@ const WhatSendingPage = () => {
           </TabsContent>
         </Tabs>
       </main>
+
+      {isEditing && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-4 rounded shadow-md w-1/3">
+            <h2 className="text-xl font-bold mb-4 dark:text-black">
+              Update the Value
+            </h2>
+            <form onSubmit={handleEditSubmit}>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={editFormData.name}
+                  onChange={handleEditChange}
+                  className="mt-1 p-2 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Status
+                </label>
+                <select
+                  name="status"
+                  value={editFormData.status}
+                  onChange={handleEditChange}
+                  className="mt-1 p-2 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                >
+                  <option value="active">Active</option>
+                  <option value="deActive">Deactive</option>
+                </select>
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setIsEditing(false)}
+                  className="mr-2 px-4 py-2 bg-gray-500 text-white rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-500 text-white rounded"
+                >
+                  Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

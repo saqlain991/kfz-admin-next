@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -24,20 +25,31 @@ const AddWhatSending = () => {
   const [status, setStatus] = useState("");
   const [formSubmitted, setFormSubmitted] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!name || !status) {
       alert("Please fill out all fields correctly.");
       return;
     }
-    setFormSubmitted(true);
-    // Proceed with form submission logic here
-    console.log("Form Data Saved Successfully ");
-    console.log({
-      name: name,
-      status: status,
-    });
+
+    try {
+      const response = await axios.post("/api/create-what-sending", {
+        name,
+        status,
+      });
+
+      if (response.status === 200) {
+        alert("Data sent successfully");
+        // Optionally refetch data
+        // fetchData();
+      } else {
+        alert("Failed to send data");
+      }
+    } catch (error) {
+      console.error("Error sending data:", error);
+      alert("An error occurred while sending data");
+    }
   };
 
   return (
@@ -61,7 +73,7 @@ const AddWhatSending = () => {
               </div>
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="status">Choose Status</Label>
-                <Select>
+                <Select onValueChange={setStatus}>
                   <SelectTrigger id="status">
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>

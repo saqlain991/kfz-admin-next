@@ -7,6 +7,7 @@ import {
   BriefcaseBusiness,
   Car,
   ChevronDown,
+  Container,
   CreditCard,
   Eye,
   File,
@@ -39,6 +40,11 @@ const Sidebar = () => {
       url: "/dashboard/order",
     },
     {
+      name: "Packers & Movers",
+      icons: <Container />,
+      url: "/dashboard/packers",
+    },
+    {
       name: "Customer Details",
       icons: <Users />,
       url: "/dashboard/customer",
@@ -48,16 +54,16 @@ const Sidebar = () => {
       icons: <Car />,
       url: "/dashboard/driver",
     },
+    {
+      name: "Driver Request List",
+      icons: <UserCheck />,
+      url: "/dashboard/driver/driver-request",
+    },
 
     {
       name: "Payment Details",
       icons: <CreditCard />,
       url: "/dashboard/payment",
-    },
-    {
-      name: "Driver Request List",
-      icons: <UserCheck />,
-      url: "/dashboard/driver/driver-request",
     },
     {
       name: "Notification ",

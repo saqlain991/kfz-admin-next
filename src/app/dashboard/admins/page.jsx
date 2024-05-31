@@ -110,7 +110,7 @@ const AdminPage = () => {
             <CardContent>
               <ScrollArea className="h-[480px] w-full overflow-y-auto">
                 <Table>
-                  <TableHeader className="bg-slate-100 py-4">
+                  <TableHeader className=" py-4">
                     <TableRow>
                       <TableHead style={{ whiteSpace: "nowrap" }}>Id</TableHead>
                       <TableHead style={{ whiteSpace: "nowrap" }}>

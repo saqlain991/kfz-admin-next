@@ -231,27 +231,10 @@ const CustomerPage = () => {
                               </TableCell>
 
                               <TableCell>
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button
-                                      aria-haspopup="true"
-                                      size="icon"
-                                      variant="ghost"
-                                    >
-                                      <MoreHorizontal className="h-4 w-4" />
-                                      <span className="sr-only">
-                                        Toggle menu
-                                      </span>
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end">
-                                    <DropdownMenuLabel>
-                                      Actions
-                                    </DropdownMenuLabel>
-                                    <DropdownMenuItem>Edit</DropdownMenuItem>
-                                    <DropdownMenuItem>Delete</DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
+                                <div className=" flex flex-row gap-2">
+                                  <Button variant="outline">Edit</Button>
+                                  <Button variant="outline">Block</Button>
+                                </div>
                               </TableCell>
                             </TableRow>
                           ))}

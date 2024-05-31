@@ -1,13 +1,7 @@
 "use client";
-import {
-  ArrowUpRight,
-  Car,
-  CreditCardIcon,
-  ShoppingCart,
-  Users,
-} from "lucide-react";
-import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import axios from "axios";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -16,103 +10,55 @@ import {
 } from "@/components/ui/card";
 import HomeCard from "@/components/Card";
 import BarGraph from "@/components/ui/GraphChart";
-import DoughnutChart from "@/components/ui/DoughnutGraph";
-import RecentOrderCard from "@/components/recentOrder";
-import Cookies from "js-cookie";
-import axios from "axios";
+import PieChart from "@/components/PieChart";
+import SplineAreaChart from "@/components/SplineAreaChart";
+import { Car, CreditCardIcon, ShoppingCart, Users } from "lucide-react";
 
 const Dashboard = () => {
   const [error, setError] = useState("");
   const [homeCardIcons, setHomeCardIcons] = useState([]);
-  // setHomeCardIcons = [
-  //   {
-  //     title: "Total Payment",
-  //     icons: <CreditCardIcon />,
-  //     value: "₹ 500",
-  //     url: "/payment",
-  //   },
-  //   {
-  //     title: "Total Customer",
-  //     icons: <Users />,
-  //     value: "500",
-  //     url: "/customer",
-  //   },
-  //   {
-  //     title: "Total Driver",
-  //     icons: <Car />,
-  //     value: "500",
-  //     url: "/driver",
-  //   },
-  //   {
-  //     title: "Total Order",
-  //     icons: <ShoppingCart />,
-  //     value: "500",
-  //     url: "/order",
-  //   },
-  // ];
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // console.log("-----Hello-----");
         const response = await axios.post("/api/dashboard");
-
-        if (response.status) {
-          // Store the token in cookies or localStorage as needed
-          // Redirect to a protected page
-          // router.push("/dashboard");
-          console.log("-----d", response);
+        if (response.status === 200) {
           let dashboardArray = [];
-
           for (let i = 0; i < response.data.data.length; i++) {
             const element = response.data.data[i];
             let obj = {};
-            if (element.title == "Orders") {
+            if (element.title === "Orders") {
               obj = {
                 title: element.title,
                 icons: <ShoppingCart />,
                 value: element.value,
                 url: "/dashboard/order",
               };
-
-              dashboardArray.push(obj);
-            }
-
-            if (element.title == "Total Revenue") {
+            } else if (element.title === "Total Revenue") {
               obj = {
                 title: element.title,
                 icons: <CreditCardIcon />,
                 value: element.value,
                 url: "/dashboard/payment",
               };
-
-              dashboardArray.push(obj);
-            }
-
-            if (element.title == "Customers") {
+            } else if (element.title === "Customers") {
               obj = {
                 title: element.title,
                 icons: <Users />,
                 value: element.value,
                 url: "/dashboard/customer",
               };
-
-              dashboardArray.push(obj);
-            }
-
-            if (element.title == "Active Drivers") {
+            } else if (element.title === "Active Drivers") {
               obj = {
                 title: element.title,
                 icons: <Car />,
                 value: element.value,
                 url: "/dashboard/driver",
               };
-
-              dashboardArray.push(obj);
             }
+            dashboardArray.push(obj);
           }
-          await setHomeCardIcons(dashboardArray);
-          console.log("Heloo______--", homeCardIcons);
+          setHomeCardIcons(dashboardArray);
         } else {
           setError(response.msg);
         }
@@ -147,9 +93,23 @@ const Dashboard = () => {
             className="flex flex-wrap  gap-4 pt-5"
             x-chunk="dashboard-01-chunk-5"
           >
+            <Card className="flex-grow max-w-screen w-full sm:w-[700px] gap-4 pt-5">
+              <CardHeader className="font-bold text-2xl">
+                Spline Area Chart
+                <CardDescription className="font-normal">
+                  Here is the Order Summary!!!
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent>
+                {/* Spline Area Chart implementation */}
+                <SplineAreaChart />
+              </CardContent>
+            </Card>
+
             <Card className="flex-grow max-w-[700px] w-full sm:w-[700px] gap-4 pt-5">
               <CardHeader className="font-bold text-2xl">
-                Order Summary
+                Bar Area Chart
                 <CardDescription className="font-normal">
                   Here is the Order Summary!!!
                 </CardDescription>
@@ -163,15 +123,15 @@ const Dashboard = () => {
 
             <Card className="flex-grow max-w-[500px] w-full sm:w-[300px] pt-5">
               <CardHeader className="font-bold text-2xl">
-                Order Chart
+                Pie Chart
                 <CardDescription className="font-normal">
                   Here is the Order Chart
                 </CardDescription>
               </CardHeader>
 
-              <CardContent>
-                {/* Bar Graph implementation */}
-                <DoughnutChart />
+              <CardContent className="h-96">
+                {/* Radial Bar Chart implementation */}
+                <PieChart />
               </CardContent>
             </Card>
           </div>

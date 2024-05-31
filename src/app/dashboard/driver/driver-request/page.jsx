@@ -143,7 +143,7 @@ const DriverPage = () => {
                 <CardContent>
                   <ScrollArea className="h-[480px] w-full overflow-y-auto">
                     <Table>
-                      <TableHeader className="bg-slate-100 py-4 text-black dark:text-black ">
+                      <TableHeader className=" py-4 text-black dark:text-black ">
                         <TableRow>
                           <TableHead style={{ whiteSpace: "nowrap" }}>
                             Sr.No
@@ -160,9 +160,9 @@ const DriverPage = () => {
                           <TableHead style={{ whiteSpace: "nowrap" }}>
                             Document
                           </TableHead>
-                          <TableHead style={{ whiteSpace: "nowrap" }}>
+                          {/* <TableHead style={{ whiteSpace: "nowrap" }}>
                             Status
-                          </TableHead>
+                          </TableHead> */}
                           <TableHead style={{ whiteSpace: "nowrap" }}>
                             Created at
                           </TableHead>
@@ -200,14 +200,14 @@ const DriverPage = () => {
                               <TableCell className="font-medium p-2">
                                 {cData.document}
                               </TableCell>
-                              <TableCell className="font-medium p-2">
+                              {/* <TableCell className="font-medium p-2">
                                 <Badge
                                   style={{ whiteSpace: "nowrap" }}
                                   variant="outline"
                                 >
                                   {cData.status}
                                 </Badge>
-                              </TableCell>
+                              </TableCell> */}
 
                               <TableCell className="font-medium p-2">
                                 {cData.registerDate}
@@ -215,10 +215,8 @@ const DriverPage = () => {
 
                               <TableCell>
                                 <div className=" flex flex-row gap-2">
-                                  <Button variant="ghost" className="text-2xl">
-                                    ✅
-                                  </Button>
-                                  <Button variant="ghost">❌</Button>
+                                  <Button variant="outline">Accept</Button>
+                                  <Button variant="outline">Decline</Button>
                                 </div>
                               </TableCell>
                             </TableRow>
