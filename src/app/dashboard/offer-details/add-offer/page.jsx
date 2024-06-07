@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
 import axios from "axios";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -10,8 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -19,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
 const AddOffer = () => {
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -31,16 +31,12 @@ const AddOffer = () => {
     max_discount: "",
     min_order_value: "",
     usage_limit: "",
-    start_date: "",
+    start_date: new Date().toISOString().split("T")[0], // Set start date to today's date
     end_date: "",
   });
 
   const handleChange = (e) => {
     const { id, value } = e.target;
-    setFormData({ ...formData, [id]: value });
-  };
-
-  const handleSelectChange = (id, value) => {
     setFormData({ ...formData, [id]: value });
   };
 
@@ -52,6 +48,20 @@ const AddOffer = () => {
       console.log("Form Data:", formData); // Log form data for debugging
       const response = await axios.post("/api/add-offer", formData);
       console.log("Response:", response.data);
+      alert("Form submitted successfully!"); // Show alert after successful submission
+      setFormData({
+        // Clear form data after submission
+        code: "",
+        image: "",
+        description: "",
+        discount_type: "",
+        discount_value: "",
+        max_discount: "",
+        min_order_value: "",
+        usage_limit: "",
+        start_date: new Date().toISOString().split("T")[0], // Reset start date to today's date
+        end_date: "",
+      });
     } catch (error) {
       console.error(
         "Error adding order:",
@@ -60,6 +70,17 @@ const AddOffer = () => {
     } finally {
       setFormSubmitted(false);
     }
+  };
+  const handleSelectChange = (id, value) => {
+    setFormData({ ...formData, [id]: value });
+  };
+  const handleStartDateChange = (e) => {
+    const { value } = e.target;
+    setFormData({
+      ...formData,
+      start_date: value,
+      end_date: "", // Reset end date when start date changes
+    });
   };
 
   return (
@@ -86,7 +107,12 @@ const AddOffer = () => {
               </div>
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="image">Upload Image</Label>
-                <Input type="file" value={formData.images} />
+                <Input
+                  id="image"
+                  type="file"
+                  onChange={handleChange}
+                  accept="image/*"
+                />
               </div>
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="description">Description</Label>
@@ -160,8 +186,9 @@ const AddOffer = () => {
                   className="w-full"
                   id="start_date"
                   type="date"
+                  min={new Date().toISOString().split("T")[0]} // Set min attribute to today's date
                   value={formData.start_date}
-                  onChange={handleChange}
+                  onChange={handleStartDateChange}
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
@@ -170,6 +197,7 @@ const AddOffer = () => {
                   className="w-full"
                   id="end_date"
                   type="date"
+                  min={formData.start_date} // Set min attribute to start date
                   value={formData.end_date}
                   onChange={handleChange}
                 />

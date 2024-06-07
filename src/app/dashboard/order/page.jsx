@@ -22,30 +22,46 @@ import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Search } from "lucide-react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
+import AddDialogModal from "@/components/AddDialogModal";
 
 const OrderPage = () => {
   const [orderData, setOrderData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isDialogOpen, setIsDialogOpen] = useState(false); // State for dialog
   const itemsPerPage = 10;
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const handleOrderSubmit = (formData) => {
+    // Add your form submission logic here
+    console.log("Order data submitted:", formData);
+  };
 
+  
+  // const fetchData = async () => {
+  //   try {
+  //     const response = await axios.get("/api/orders");
+  //     console.log("Response Data", response.data);
+  //     if (response.data && response.data.data) {
+  //       setOrderData(response.data.data); // Adjust this if necessary based on the actual response structure
+  //     } else {
+  //       console.error("Unexpected response structure", response.data);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error);
+  //   }
+  // };
+  
   const fetchData = async () => {
     try {
-      const response = await axios.get("/api/orders");
-      console.log("Response Data", response.data);
-      if (response.data && response.data.data) {
-        setOrderData(response.data.data); // Adjust this if necessary based on the actual response structure
-      } else {
-        console.error("Unexpected response structure", response.data);
-      }
+      
+      const response = await axios.post("/api/orders", { route: "get" });
+      setWhatSendingData(response.data.data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
-
+  useEffect(() => {
+    fetchData();
+  }, []);
   // Function to format date as ddmmyyyy
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -96,11 +112,14 @@ const OrderPage = () => {
                 <Button size="sm" variant="outline" className="h-7 gap-1">
                   Export
                 </Button>
-                <Link href={"/dashboard/order/add-order"}>
-                  <Button size="sm" variant="outline" className="h-7 gap-1">
-                    Add Order
-                  </Button>
-                </Link>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 gap-1"
+                  onClick={() => setIsDialogOpen(true)} // Open the dialog
+                >
+                  Add Order
+                </Button>
               </div>
             </div>
             <TabsContent value="all">
@@ -213,6 +232,11 @@ const OrderPage = () => {
           </Tabs>
         </main>
       </h1>
+      <AddDialogModal
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        onSubmit={handleOrderSubmit}
+      />
     </div>
   );
 };

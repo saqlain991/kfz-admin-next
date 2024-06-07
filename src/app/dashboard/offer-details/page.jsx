@@ -193,8 +193,8 @@ const OfferPage = () => {
                                 </TableCell>
                                 <TableCell>{offer.description}</TableCell>
                                 <TableCell>{offer.discount_type}</TableCell>
-                                <TableCell>{`${offer.discount_value} %`}</TableCell>
-                                <TableCell>{`${offer.max_discount} %`}</TableCell>
+                                <TableCell>{`${offer.discount_value} `}</TableCell>
+                                <TableCell>{`${offer.max_discount} `}</TableCell>
                                 <TableCell>{offer.min_order_value}</TableCell>
                                 <TableCell>{offer.usage_limit}</TableCell>
                                 <TableCell style={{ whiteSpace: "nowrap" }}>

@@ -84,7 +84,7 @@ const HelpPage = () => {
         <div className="flex items-center px-5">
           <div className="flex flex-col w-full">
             <h1 className="font-bold text-2xl pb-3 px-5">Help & Support</h1>
-            <form>
+            {/* <form>
               <div className="relative w-full">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -93,10 +93,10 @@ const HelpPage = () => {
                   className="w-full appearance-none bg-background pl-8 shadow-none md:w-2/3 lg:w-1/3"
                 />
               </div>
-            </form>
+            </form> */}
           </div>
           <div className="ml-auto flex items-center gap-2">
-            <Link href={"/dashboard/admins/add-admins"}>
+            <Link href={"/dashboard/help/solved-query"}>
               <Button size="sm" variant="outline" className="h-7 gap-1">
                 {/* <PlusCircle className="h-3.5 w-3.5" /> */}
                 <CircleCheck className="h-3.5 w-3.5" />
@@ -163,7 +163,9 @@ const HelpPage = () => {
                               {formatDate(hData.created_at)}
                             </TableCell>
                             <TableCell>
-                              <Button variant="outline">Complete</Button>
+                              <Button variant="outline" className="mr-2">
+                                Complete
+                              </Button>
                               <Button variant="outline">Delete</Button>
                             </TableCell>
                           </TableRow>

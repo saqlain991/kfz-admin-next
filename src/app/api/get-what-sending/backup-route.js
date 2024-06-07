@@ -2,7 +2,6 @@
 
 import { NextResponse } from "next/server";
 import axios from "axios";
-import Cookies from "js-cookie";
 
 export async function POST(request) {
   let jsondata= await request.json();
@@ -12,26 +11,20 @@ export async function POST(request) {
   }else if(jsondata.route == "delete"){
     let data = await delete_whatsending(jsondata);
     return data;
-  }else if(jsondata.route == "delete"){
-    let data = await add_WhatSending(jsondata);
-    return data;
   }
 }
 
 async function get_what_sending(request) {
   try {
-
-    const reqCookies = Cookies(); // Get cookies from the request
-    const token = reqCookies.get("token");
-    // const token =
-    //   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6ImFkbWluIiwiZW1haWwiOiJhZG1pbkBnbWFpbC5jb20iLCJwYXNzd29yZCI6IjAxOTIwMjNhN2JiZDczMjUwNTE2ZjA2OWRmMThiNTAwIiwicmVzZXRfdG9rZW4iOm51bGwsImFkbWluX3R5cGUiOjEsImNyZWF0ZWRfYXQiOiIyMDI0LTA1LTEzVDE4OjQ2OjM3LjAwMFoiLCJ1cGRhdGVkX2F0IjoiMjAyNC0wNS0xM1QxODo0NjozNy4wMDBaIiwiaWF0IjoxNzE2NjIxNzcxfQ.F78H5PmNFQGGDOljfeINhgDnrCmxcWqibqy7RnqnR9A"; // Provide the token value here
+    const token =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6ImFkbWluIiwiZW1haWwiOiJhZG1pbkBnbWFpbC5jb20iLCJwYXNzd29yZCI6IjAxOTIwMjNhN2JiZDczMjUwNTE2ZjA2OWRmMThiNTAwIiwicmVzZXRfdG9rZW4iOm51bGwsImFkbWluX3R5cGUiOjEsImNyZWF0ZWRfYXQiOiIyMDI0LTA1LTEzVDE4OjQ2OjM3LjAwMFoiLCJ1cGRhdGVkX2F0IjoiMjAyNC0wNS0xM1QxODo0NjozNy4wMDBaIiwiaWF0IjoxNzE2NjIxNzcxfQ.F78H5PmNFQGGDOljfeINhgDnrCmxcWqibqy7RnqnR9A"; // Provide the token value here
     if (!token) {
       return NextResponse.json({ error: "No token provided" }, { status: 401 });
     }
 
     const config = {
       method: "post",
-      url: `${process.env.API_BASE_URL}/admins/get_what_sending`,
+      url: "https://d33ftxxwr8ksno.cloudfront.net/admins/get_what_sending",
       headers: {
         Authorization: ` ${token}`,
       },
@@ -65,35 +58,6 @@ async function delete_whatsending(request) {
     );
   } catch (error) {
     
-  }
-}
-
-async function add_WhatSending(request) {
-  try {
-    const reqCookies = new Cookies(request); // Instantiate Cookies with the request
-    const token = reqCookies.get("token"); // Retrieve token from cookies
-    if (!token) {
-      return NextResponse.json({ error: "No token provided" }, { status: 401 });
-    }
-
-    const config = {
-      method: "post",
-      url: `${process.env.API_BASE_URL}/admins/create_what_sending`,
-      headers: {
-        Authorization: ` ${token}`,
-      },
-      data: request.body,
-    };
-    const response = await axios.request(config);
-
-    if (!response.data) {
-      return NextResponse.json({ error: "Failed to add data" }, { status: response.status });
-    }
-
-    return NextResponse.json(response.data);
-  } catch (error) {
-    console.error("Error in add API route:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
 
@@ -165,3 +129,4 @@ async function add_WhatSending(request) {
 //     );
 //   }
 // }
+

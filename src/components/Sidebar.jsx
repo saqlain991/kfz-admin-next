@@ -35,12 +35,12 @@ const Sidebar = () => {
       url: "/dashboard",
     },
     {
-      name: "Order Details",
+      name: "Orders ",
       icons: <ShoppingCart />,
       url: "/dashboard/order",
     },
     {
-      name: "Packers & Movers",
+      name: "Offline Orders",
       icons: <Container />,
       url: "/dashboard/packers",
     },

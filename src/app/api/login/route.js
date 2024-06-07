@@ -33,15 +33,39 @@ export async function POST(request) {
 
       // Set the token as a cookie
       const res = NextResponse.json({ msg: data.msg, status: data.status });
-      res.headers.set(
-        "Set-Cookie",
-        cookie.serialize("token", token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV !== "development",
-          maxAge: 60 * 60 * 24 * 7, // 1 week
-          path: "/",
-        })
-      );
+      // res.headers.set(
+      //   "Set-Cookie",
+      //   cookie.serialize("token", token, {
+      //     httpOnly: true,
+      //     secure: process.env.NODE_ENV !== "development",
+      //     maxAge: 60 * 60 * 24 * 7, // 1 week
+      //     path: "/",
+      //   })
+      // );
+
+      // const { cookies: cookiesToSet } = data.data;
+      const cookiesToSet = {
+        token: token,
+        admin_type: JSON.stringify(data.data.admin_type),
+      }
+      console.log("--------", data.data);
+
+    if (!cookiesToSet || typeof cookiesToSet !== 'object') {
+      return res.status(400).json({ error: 'Invalid cookies object' });
+    }
+
+    const serializedCookies =  Object.keys(cookiesToSet).map(key =>
+      cookie.serialize(key, cookiesToSet[key], {
+        httpOnly: true,
+        secure: process.env.NODE_ENV !== 'development',
+        maxAge: 60 * 60 * 24 * 7, // 1 week
+        path: '/',
+      })
+    );
+    console.log("Hello serial", serializedCookies);
+
+    // Set the cookies in the response header
+    res.headers.set('Set-Cookie', serializedCookies);
 
       return res;
     }

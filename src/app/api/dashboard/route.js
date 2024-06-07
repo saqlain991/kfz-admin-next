@@ -8,6 +8,7 @@ export async function POST(request) {
   try {
     const reqCookies = cookies(); // Get cookies from the request
     const token = reqCookies.get("token");
+    const admin_type = reqCookies.get("admin_type");
     // console.log(token, " -------- ");
 
     if (!token) {
