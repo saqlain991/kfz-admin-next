@@ -17,8 +17,6 @@ const WhatSendingPage = () => {
   const [whatSendingData, setWhatSendingData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [editItemId, setEditItemId] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     status: "active",
@@ -26,13 +24,38 @@ const WhatSendingPage = () => {
 
   const itemsPerPage = 10;
 
-  // Fetch data from API
   const fetchData = async () => {
     try {
-      const response = await axios.post("/api/get-what-sending", { route: "get" });
+      const response = await axios.post("/api/what-sending", { route: "get" });
       setWhatSendingData(response.data.data);
     } catch (error) {
       console.error("Error fetching data:", error);
+    }
+  };
+  
+  const handleDeleteClick = async (id) => {
+    try {
+      await axios.post("/api/what-sending", { route: "delete", id: id });
+      setWhatSendingData(whatSendingData.filter((item) => item.id !== id));
+    } catch (error) {
+      console.error("Error deleting item:", error);
+    }
+  };
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post("/api/what-sending", { ...formData, route: "add" });
+      if (response.status === 200) {
+        setWhatSendingData([...whatSendingData, response.data]);
+        alert("What Sending item added successfully!");
+        handleModalClose();
+      } else {
+        alert("Failed to add What Sending item");
+      }
+    } catch (error) {
+      console.error("Error adding What Sending item:", error);
+      alert("An error occurred while adding the item");
     }
   };
 
@@ -46,79 +69,30 @@ const WhatSendingPage = () => {
 
   const totalPages = Math.ceil(whatSendingData.length / itemsPerPage);
 
-  // Handle delete functionality
-  const handleDeleteClick = async (id) => {
-    try {
-      await axios.post("/api/get-what-sending", { route: "delete", id: id });
-      setWhatSendingData(whatSendingData.filter((item) => item.id !== id));
-    } catch (error) {
-      console.error("Error deleting item:", error);
-    }
-  };
+ 
 
-  // Handle add button click
   const handleAddClick = () => {
-    setIsEditMode(false);
-    setFormData({ name: "", status: "active" });
     setIsModalOpen(true);
   };
 
-  // Handle edit button click
-  const handleEditClick = (item) => {
-    setIsEditMode(true);
-    setEditItemId(item.id);
-    setFormData({ name: item.name, status: item.status });
-    setIsModalOpen(true);
-  };
-
-  // Close modal
   const handleModalClose = () => {
     setIsModalOpen(false);
   };
 
-  // Handle form input change
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handle select change
   const handleSelectChange = (value) => {
     setFormData({ ...formData, status: value });
   };
 
-  // Handle form submission for add/edit
- 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  const route = isEditMode ? "edit" : "add";
-  const apiData = isEditMode ? { ...formData, id: editItemId, route } : { ...formData, route };
-
-  try {
-    // Make a POST request to your API route
-    const response = await axios.post("/api/get-what-sending", apiData);
-
-    // Check if the request was successful
-    if (response.status === 200) {
-      // If successful, update the data and close the modal
-      fetchData();
-      alert(`What Sending item ${isEditMode ? "updated" : "added"} successfully!`);
-      handleModalClose();
-    } else {
-      // If not successful, display an error message
-      alert(`Failed to ${isEditMode ? "edit" : "add"} What Sending item`);
-    }
-  } catch (error) {
-    // If an error occurs, log the error and display an error message
-    console.error(`Error ${isEditMode ? "editing" : "adding"} What Sending item:`, error);
-    alert(`An error occurred while ${isEditMode ? "editing" : "adding"} the item`);
-  }
-};
-
-  // Format date for display
+  
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString();
   };
+
   return (
     <div>
       <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
@@ -168,7 +142,6 @@ const handleSubmit = async (e) => {
                         <TableCell>{item.status ? "Active" : "Deactive"}</TableCell>
                         <TableCell>{formatDate(item.created_at)}</TableCell>
                         <TableCell>
-                          {/* <Button onClick={() => handleEditClick(item)}>Edit</Button> */}
                           <Button onClick={() => handleDeleteClick(item.id)}>Delete</Button>
                         </TableCell>
                       </TableRow>
@@ -192,10 +165,8 @@ const handleSubmit = async (e) => {
         <Dialog open={isModalOpen} onOpenChange={handleModalClose}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>{isEditMode ? "Edit" : "Add"} What Sending</DialogTitle>
-              <DialogDescription>
-                {isEditMode ? "Edit the existing" : "Add a new"} What Sending item
-              </DialogDescription>
+              <DialogTitle>Add What Sending</DialogTitle>
+              <DialogDescription>Here you can add a new What Sending item</DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit}>
               <div className="grid gap-4 pt-5">
@@ -223,7 +194,7 @@ const handleSubmit = async (e) => {
                 </div>
               </div>
               <DialogFooter>
-                <Button type="submit">{isEditMode ? "Update" : "Add"} What Sending</Button>
+                <Button type="submit">Add What Sending</Button>
               </DialogFooter>
             </form>
           </DialogContent>

@@ -12,15 +12,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Table,
@@ -31,25 +22,27 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  File,
-  ListFilter,
-  MoreHorizontal,
-  PlusCircle,
-  Search,
-} from "lucide-react";
-import Link from "next/link";
+import { PlusCircle, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectItem } from "@/components/ui/select";
 
 const AdminPage = () => {
   const [adminData, setAdminData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [newAdmin, setNewAdmin] = useState({
+    name: "",
+    email: "",
+    password: "",
+    admin_type: 1,
+  });
   const itemsPerPage = 10;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("/api/admin-details");
+        const response = await axios.get("/api/admins");
         setAdminData(response.data.data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -59,7 +52,27 @@ const AdminPage = () => {
     fetchData();
   }, []);
 
-  // Format Date Function Logic
+  const handleAddAdmin = async () => {
+    try {
+      await axios.post("/api/admins", newAdmin);
+      setIsDialogOpen(false);
+      setNewAdmin({ name: "", email: "", password: "", admin_type: 1 });
+      const response = await axios.get("/api/admins");
+      setAdminData(response.data.data);
+    } catch (error) {
+      console.error("Error adding admin:", error);
+    }
+  };
+
+  const handleDeleteAdmin = async (id) => {
+    try {
+      await axios.delete(`/api/admins?id=${id}`);
+      setAdminData(adminData.filter(admin => admin.id !== id));
+    } catch (error) {
+      console.error("Error deleting admin:", error);
+    }
+  };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, "0");
@@ -68,17 +81,11 @@ const AdminPage = () => {
     return `${day}-${month}-${year}`;
   };
 
-  // Calculate total pages
   const totalPages = Math.ceil(adminData.length / itemsPerPage);
-
-  // Function to handle page change
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
+  const handlePageChange = (page) => setCurrentPage(page);
 
   return (
     <div>
-      {/* <h1 className="text-2xl font-bold">Admins</h1> */}
       <Tabs defaultValue="all">
         <div className="flex items-center px-5">
           <div className="flex flex-col w-full">
@@ -88,21 +95,19 @@ const AdminPage = () => {
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="search"
-                  placeholder="Search Customer..."
+                  placeholder="Search Admin..."
                   className="w-full appearance-none bg-background pl-8 shadow-none md:w-2/3 lg:w-1/3"
                 />
               </div>
             </form>
           </div>
           <div className="ml-auto flex items-center gap-2">
-            <Link href={"/dashboard/admins/add-admins"}>
-              <Button size="sm" variant="outline" className="h-7 gap-1">
-                <PlusCircle className="h-3.5 w-3.5" />
-                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                  Add Admin
-                </span>
-              </Button>
-            </Link>
+            <Button size="sm" variant="outline" className="h-7 gap-1" onClick={() => setIsDialogOpen(true)}>
+              <PlusCircle className="h-3.5 w-3.5" />
+              <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                Add Admin
+              </span>
+            </Button>
           </div>
         </div>
         <TabsContent value="all">
@@ -110,7 +115,7 @@ const AdminPage = () => {
             <CardContent>
               <ScrollArea className="h-[480px] w-full overflow-y-auto">
                 <Table>
-                  <TableHeader className=" py-4">
+                  <TableHeader className="py-4">
                     <TableRow>
                       <TableHead style={{ whiteSpace: "nowrap" }}>Id</TableHead>
                       <TableHead style={{ whiteSpace: "nowrap" }}>
@@ -137,7 +142,7 @@ const AdminPage = () => {
                           (currentPage - 1) * itemsPerPage,
                           currentPage * itemsPerPage
                         )
-                        .map((aData, index) => (
+                        .map((aData) => (
                           <TableRow key={aData.id}>
                             <TableCell className="font-medium p-2">
                               #{aData.id}
@@ -155,7 +160,12 @@ const AdminPage = () => {
                               {formatDate(aData.created_at)}
                             </TableCell>
                             <TableCell>
-                              <Button variant="outline">Delete</Button>
+                              <Button
+                                variant="outline"
+                                onClick={() => handleDeleteAdmin(aData.id)}
+                              >
+                                Delete
+                              </Button>
                             </TableCell>
                           </TableRow>
                         ))
@@ -183,12 +193,67 @@ const AdminPage = () => {
                     ? adminData.length
                     : currentPage * itemsPerPage}
                 </strong>{" "}
-                of <strong>{adminData.length}</strong> employees
+                of <strong>{adminData.length}</strong> admins
               </div>
             </CardFooter>
           </Card>
         </TabsContent>
       </Tabs>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogTitle>Add Admin</DialogTitle>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleAddAdmin();
+            }}
+          >
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium">Full Name</label>
+                <Input
+                  type="text"
+                  value={newAdmin.name}
+                  onChange={(e) => setNewAdmin({ ...newAdmin, name: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">Email</label>
+                <Input
+                  type="email"
+                  value={newAdmin.email}
+                  onChange={(e) => setNewAdmin({ ...newAdmin, email: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">Password</label>
+                <Input
+                  type="password"
+                  value={newAdmin.password}
+                  onChange={(e) => setNewAdmin({ ...newAdmin, password: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">Choose Type</label>
+                <Select
+                  value={newAdmin.admin_type}
+                  onChange={(e) => setNewAdmin({ ...newAdmin, admin_type: parseInt(e.target.value) })}
+                >
+                  <SelectItem value={1}>Admin</SelectItem>
+                  <SelectItem value={2}>Sub-Admin</SelectItem>
+                </Select>
+              </div>
+            </div>
+            <div className="mt-6">
+              <Button type="submit">Register</Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

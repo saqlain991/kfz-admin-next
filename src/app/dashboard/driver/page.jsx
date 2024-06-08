@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CustomPagination } from "@/components/pagination";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,14 +12,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Table,
@@ -39,104 +40,73 @@ import {
   Search,
 } from "lucide-react";
 import Image from "next/image";
-import React from "react";
 import Link from "next/link";
-import { Input } from "@/components/ui/input";
+import axios from 'axios';
+import React from "react";
+import { useRouter } from 'next/navigation';
 
 const DriverPage = () => {
-  const customerData = [
-    {
-      customerName: "John Doe",
-      email: "johndoe@gmail.com",
-      phone: "+91 90909090",
-      document: "Pan Card",
-      status: "Active",
-      registerDate: "2023-04-12",
-    },
-    {
-      customerName: "Jane Smith",
-      email: "janesmith@example.com",
-      phone: "+1 1234567890",
-      document: "Aadhar Card",
-      status: "Pending",
-      registerDate: "2023-04-13",
-    },
-    {
-      customerName: "Alice Johnson",
-      email: "alicejohnson@example.com",
-      phone: "+44 1234567890",
-      document: "Pan Card",
-      status: "Active",
-      registerDate: "2023-04-14",
-    },
-    {
-      customerName: "Bob Brown",
-      email: "bobbrown@example.com",
-      phone: "+61 1234567890",
-      document: "Aadhar Card",
-      status: "Pending",
-      registerDate: "2023-04-15",
-    },
-    {
-      customerName: "Emily Wilson",
-      email: "emilywilson@example.com",
-      phone: "+81 1234567890",
-      document: "Aadhar Card",
-      status: "Active",
-      registerDate: "2023-04-16",
-    },
-    {
-      customerName: "David Lee",
-      email: "davidlee@example.com",
-      phone: "+82 1234567890",
-      document: "Pan Card",
-      status: "Active",
-      registerDate: "2023-04-17",
-    },
-    {
-      customerName: "Maria Garcia",
-      email: "mariagarcia@example.com",
-      phone: "+34 1234567890",
-      document: "Aadhar Card",
-      status: "Pending",
-      registerDate: "2023-04-18",
-    },
-    {
-      customerName: "Luca Rossi",
-      email: "lucarossi@example.com",
-      phone: "+39 1234567890",
-      document: "Aadhar Card",
-      status: "Active",
-      registerDate: "2023-04-19",
-    },
-    {
-      customerName: "Sophie Martin",
-      email: "sophiemartin@example.com",
-      phone: "+33 1234567890",
-      document: "Pan Card",
-      status: "Pending",
-      registerDate: "2023-04-20",
-    },
-    {
-      customerName: "Mohammed Khan",
-      email: "mohammedkhan@example.com",
-      phone: "+92 1234567890",
-      document: "Aadhar Card",
-      status: "Active",
-      registerDate: "2023-04-21",
-    },
-  ];
-
-  // State for current page and items per page
+  const [driverData, setDriverData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [showDialog, setShowDialog] = useState(false);
+  const [newDriver, setNewDriver] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    documentType: '',
+    documentFile: null,
+  });
+
   const itemsPerPage = 10;
+  const totalPages = Math.ceil(driverData.length / itemsPerPage);
 
-  // Calculate total pages
-  const totalPages = Math.ceil(customerData.length / itemsPerPage);
+  const router = useRouter();
 
-  // Function to handle page change
+  useEffect(() => {
+    // Fetch driver data from the API
+    fetchDriverData();
+  }, []);
+
+  const fetchDriverData = async () => {
+    try {
+      const response = await axios.get('/api/drivers');
+      setDriverData(response.data);
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+    }
+  };
+
   const handlePageChange = (page) => {
     setCurrentPage(page);
+  };
+
+  const handleAddDriver = async () => {
+    const formData = new FormData();
+    formData.append('firstName', newDriver.firstName);
+    formData.append('lastName', newDriver.lastName);
+    formData.append('email', newDriver.email);
+    formData.append('phone', newDriver.phone);
+    formData.append('documentType', newDriver.documentType);
+    formData.append('documentFile', newDriver.documentFile);
+
+    try {
+      await axios.post('/api/drivers', formData);
+      fetchDriverData(); // Refresh data after adding new driver
+      setShowDialog(false);
+    } catch (error) {
+      console.error("Error adding driver: ", error);
+    }
+  };
+
+  const handleAccept = (driver) => {
+    alert('Request accepted successfully');
+    router.push('/dashboard/driver/accept-request');
+  };
+
+  const handleReject = (driver) => {
+    alert('Request rejected successfully');
+    router.push('/dashboard/driver/reject-request');
   };
 
   return (
@@ -147,18 +117,6 @@ const DriverPage = () => {
             <div className="flex items-center">
               <div className="flex gap-10 w-full">
                 <h1 className="font-bold text-2xl">All Driver Details</h1>
-                {/* <div className="w-full flex-1">
-                  <form>
-                    <div className="relative">
-                      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        type="search"
-                        placeholder="Search Driver..."
-                        className="w-full appearance-none bg-background pl-8 shadow-none md:w-2/3 lg:w-1/3"
-                      />
-                    </div>
-                  </form>
-                </div> */}
               </div>
               <div className="ml-auto flex items-center gap-2">
                 <Button size="sm" variant="outline" className="h-7 gap-1">
@@ -175,14 +133,97 @@ const DriverPage = () => {
                     </span>
                   </Button>
                 </Link>
-                <Link href={"/dashboard/driver/add-driver"}>
-                  <Button size="sm" variant="outline" className="h-7 gap-1">
-                    <PlusCircle className="h-3.5 w-3.5" />
-                    <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                      Add Driver
-                    </span>
-                  </Button>
-                </Link>
+                <Dialog open={showDialog} onOpenChange={setShowDialog}>
+                  <DialogTrigger asChild>
+                    <Button size="sm" variant="outline" className="h-7 gap-1">
+                      <PlusCircle className="h-3.5 w-3.5" />
+                      <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                        Add Driver
+                      </span>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add Driver</DialogTitle>
+                      <DialogDescription>
+                        Fill in the details below to add a new driver.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div>
+                        <label htmlFor="firstName" className="block text-sm font-medium ">
+                          First Name
+                        </label>
+                        <Input
+                          id="firstName"
+                          value={newDriver.firstName}
+                          onChange={(e) => setNewDriver({ ...newDriver, firstName: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="lastName" className="block text-sm font-medium ">
+                          Last Name
+                        </label>
+                        <Input
+                          id="lastName"
+                          value={newDriver.lastName}
+                          onChange={(e) => setNewDriver({ ...newDriver, lastName: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="email" className="block text-sm font-medium ">
+                          Email
+                        </label>
+                        <Input
+                          id="email"
+                          value={newDriver.email}
+                          onChange={(e) => setNewDriver({ ...newDriver, email: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="phone" className="block text-sm font-medium ">
+                          Phone
+                        </label>
+                        <Input
+                          id="phone"
+                          value={newDriver.phone}
+                          onChange={(e) => setNewDriver({ ...newDriver, phone: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="documentType" className="block text-sm font-medium ">
+                          Document Type
+                        </label>
+                        <Select
+                          onValueChange={(value) => setNewDriver({ ...newDriver, documentType: value })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select document type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Aadhar Card">Aadhar Card</SelectItem>
+                            <SelectItem value="Pan Card">Pan Card</SelectItem>
+                            <SelectItem value="Ration Card">Ration Card</SelectItem>
+                            <SelectItem value="Driving Licence">Driving Licence</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <label htmlFor="documentFile" className="block text-sm font-medium ">
+                          Upload Document
+                        </label>
+                        <Input
+                          id="documentFile"
+                          type="file"
+                          onChange={(e) => setNewDriver({ ...newDriver, documentFile: e.target.files[0] })}
+                        />
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <Button onClick={handleAddDriver}>Add Driver</Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
             <TabsContent value="all">
@@ -207,18 +248,9 @@ const DriverPage = () => {
                           <TableHead style={{ whiteSpace: "nowrap" }}>
                             Document
                           </TableHead>
-                          {/* <TableHead style={{ whiteSpace: "nowrap" }}>
-                            Document Image
-                          </TableHead> */}
-
-                          {/* // Status Here 
-                          <TableHead style={{ whiteSpace: "nowrap" }}>
-                            Status
-                          </TableHead> */}
                           <TableHead style={{ whiteSpace: "nowrap" }}>
                             Created at
                           </TableHead>
-
                           <TableHead
                             style={{
                               whiteSpace: "nowrap",
@@ -230,55 +262,35 @@ const DriverPage = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {customerData
+                        {driverData
                           .slice(
                             (currentPage - 1) * itemsPerPage,
                             currentPage * itemsPerPage
                           )
-                          .map((cData, index) => (
+                          .map((dData, index) => (
                             <TableRow key={index}>
                               <TableCell className="font-medium p-2">
                                 {index + 1}
                               </TableCell>
                               <TableCell className="font-medium p-2">
-                                {cData.customerName}
+                                {`${dData.firstName} ${dData.lastName}`}
                               </TableCell>
                               <TableCell className="font-medium p-2">
-                                {cData.email}
+                                {dData.email}
                               </TableCell>
                               <TableCell className="font-medium p-2">
-                                {cData.phone}
+                                {dData.phone}
                               </TableCell>
                               <TableCell className="font-medium p-2">
-                                {cData.document}
+                                {dData.documentType}
                               </TableCell>
-
-                              {/* <TableCell className="font-medium p-2">
-                                <Link
-                                  href={cData.documentImage}
-                                  width={50}
-                                  height={50}
-                                  alt="Driver Document Image"
-                                ></Link>
-                              </TableCell> */}
-
-                              {/* <TableCell className="font-medium p-2">
-                                <Badge
-                                  style={{ whiteSpace: "nowrap" }}
-                                  variant="outline"
-                                >
-                                  {cData.status}
-                                </Badge>
-                              </TableCell> */}
-
                               <TableCell className="font-medium p-2">
-                                {cData.registerDate}
+                                {new Date(dData.createdAt).toLocaleDateString()}
                               </TableCell>
-
                               <TableCell>
                                 <div className=" flex flex-row gap-2">
-                                  <Button variant="outline">Accept</Button>
-                                  <Button variant="outline">Reject</Button>
+                                  <Button variant="outline" onClick={() => handleAccept(dData)}>Accept</Button>
+                                  <Button variant="outline" onClick={() => handleReject(dData)}>Reject</Button>
                                 </div>
                               </TableCell>
                             </TableRow>
@@ -296,11 +308,11 @@ const DriverPage = () => {
                   <div className="text-xs text-muted-foreground">
                     Showing{" "}
                     <strong>
-                      {currentPage * itemsPerPage > customerData.length
-                        ? customerData.length
+                      {currentPage * itemsPerPage > driverData.length
+                        ? driverData.length
                         : currentPage * itemsPerPage}
                     </strong>{" "}
-                    of <strong>{customerData.length}</strong> orders
+                    of <strong>{driverData.length}</strong> drivers
                   </div>
                 </CardFooter>
               </Card>

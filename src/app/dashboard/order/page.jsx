@@ -20,9 +20,10 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Search } from "lucide-react";
-import Link from "next/link";
 import { Input } from "@/components/ui/input";
-import AddDialogModal from "@/components/AddDialogModal";
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+// import { useToast } from "@/components/ui/toast";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 
 const OrderPage = () => {
   const [orderData, setOrderData] = useState([]);
@@ -33,36 +34,23 @@ const OrderPage = () => {
   const handleOrderSubmit = (formData) => {
     // Add your form submission logic here
     console.log("Order data submitted:", formData);
+    // showToast("Order submitted successfully!");
+    setIsDialogOpen(false);
   };
 
-  
-  // const fetchData = async () => {
-  //   try {
-  //     const response = await axios.get("/api/orders");
-  //     console.log("Response Data", response.data);
-  //     if (response.data && response.data.data) {
-  //       setOrderData(response.data.data); // Adjust this if necessary based on the actual response structure
-  //     } else {
-  //       console.error("Unexpected response structure", response.data);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error);
-  //   }
-  // };
-  
   const fetchData = async () => {
     try {
-      
       const response = await axios.post("/api/orders", { route: "get" });
-      setWhatSendingData(response.data.data);
+      setOrderData(response.data.data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
+
   useEffect(() => {
     fetchData();
   }, []);
-  // Function to format date as ddmmyyyy
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, "0");
@@ -76,6 +64,14 @@ const OrderPage = () => {
   };
 
   const totalPages = Math.ceil(orderData.length / itemsPerPage);
+
+  // const { toast } = useToast();
+
+  // const showToast = (message) => {
+  //   toast({
+  //     description: message,
+  //   });
+  // };
 
   return (
     <div>
@@ -232,11 +228,62 @@ const OrderPage = () => {
           </Tabs>
         </main>
       </h1>
-      <AddDialogModal
-        isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
-        onSubmit={handleOrderSubmit}
-      />
+
+      {/* Dialog Component */}
+      {isDialogOpen && (
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add Order</DialogTitle>
+              <DialogDescription>
+                Fill in the details below to add a new order.
+              </DialogDescription>
+            </DialogHeader>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData.entries());
+                handleOrderSubmit(data);
+              }}
+            >
+              <div className="space-y-4">
+                <Input name="firstname" placeholder="First Name" required />
+                <Input name="lastname" placeholder="Last Name" required />
+                <Input name="email" type="email" placeholder="Email" required />
+                <Input name="phone" type="tel" placeholder="Phone" required />
+                <Input
+                  name="pickupAddress"
+                  placeholder="Pickup Address"
+                  required
+                />
+                <Input
+                  name="deliverAddress"
+                  placeholder="Deliver Address"
+                  required
+                />
+                <Select name="whatSending" required>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select what you are sending" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="houseShifting">House Shifting</SelectItem>
+                    <SelectItem value="officeShifting">Office Shifting</SelectItem>
+                    <SelectItem value="accessories">Accessories</SelectItem>
+                    <SelectItem value="documents">Documents</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <DialogFooter>
+               <div className="flex pt-5 ">
+               <Button type="submit">Add Order</Button>
+               </div>
+                
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };
