@@ -26,15 +26,19 @@ export default function LoginPage() {
     try {
       const response = await axios.post("/api/login", { email, password });
 
-      if (response.status) {
-        // Store the token in cookies or localStorage as needed
-        // Redirect to a protected page
+      if (response.status === 200) {
+        const { msg, admin_type } = response.data;
+        alert(msg); // Display success message with admin type
         router.push("/dashboard");
       } else {
-        setError(response.msg);
+        const errorMsg = response.data.error || "Login failed. Please try again.";
+        setError(errorMsg);
+        alert(errorMsg);
       }
     } catch (err) {
-      setError("An error occurred. Please try again.");
+      const errorMsg = err.response?.data?.error || "An error occurred. Please try again.";
+      setError(errorMsg);
+      alert(errorMsg);
     }
   };
 
@@ -81,6 +85,12 @@ export default function LoginPage() {
                   </button>
                 </div>
               </div>
+
+              {error && (
+                <div className="text-red-500 mt-2">
+                  {error}
+                </div>
+              )}
 
               <Button className="w-full mt-5" type="submit">
                 Login
