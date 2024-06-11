@@ -181,7 +181,7 @@ const OrderPage = () => {
                             .map((order) => (
                               <TableRow key={order.id}>
                                 <TableCell>{`#${order.id}`}</TableCell>
-                                <TableCell>{order.user_id}</TableCell>
+                                {/* <TableCell>{order.user_id}</TableCell> */}
                                 <TableCell>{`${order.firstname} ${order.lastname}`}</TableCell>
                                 <TableCell>{order.email}</TableCell>
                                 <TableCell>{order.mobile_no}</TableCell>
@@ -195,8 +195,8 @@ const OrderPage = () => {
                                 <TableCell>{`₹ ${order.grand_total}`}</TableCell>
                                 <TableCell>
                                   <div className="flex gap-2">
-                                    <Button variant="outline">Accept</Button>
-                                    <Button variant="outline">Decline</Button>
+                                    <Button variant="outline">Edit</Button>
+                                    <Button variant="outline">View</Button>
                                   </div>
                                 </TableCell>
                               </TableRow>

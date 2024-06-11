@@ -1,3 +1,4 @@
+// app/(auth)/login/page.jsx
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -11,7 +12,7 @@ import { EyeIcon, EyeOff } from "lucide-react";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
 
@@ -27,18 +28,16 @@ export default function LoginPage() {
       const response = await axios.post("/api/login", { email, password });
 
       if (response.status === 200) {
-        const { msg, admin_type } = response.data;
-        alert(msg); // Display success message with admin type
+        const { msg } = response.data;
+        alert(msg);
         router.push("/dashboard");
       } else {
         const errorMsg = response.data.error || "Login failed. Please try again.";
         setError(errorMsg);
-        alert(errorMsg);
       }
     } catch (err) {
       const errorMsg = err.response?.data?.error || "An error occurred. Please try again.";
       setError(errorMsg);
-      alert(errorMsg);
     }
   };
 
@@ -48,8 +47,8 @@ export default function LoginPage() {
         <div className="mx-auto grid w-[350px] gap-6">
           <div className="grid gap-2 text-center">
             <h1 className="text-3xl font-bold">Login</h1>
-            <p className="text-balance text-muted-foreground">
-              Fill the details to access your account
+            <p className="text-muted-foreground">
+              Fill in the details to access your account
             </p>
           </div>
           <div className="grid gap-4">
@@ -101,14 +100,10 @@ export default function LoginPage() {
       </div>
       <div className="hidden bg-muted lg:block">
         <Image
-          alt="Image"
-          className="h-full w-full object-cover  "
+          alt="Login image"
+          className="h-full w-full object-cover"
           height="1080"
           src="/login.png"
-          style={{
-            aspectRatio: "1920/1080",
-            objectFit: "cover",
-          }}
           width="1920"
         />
       </div>

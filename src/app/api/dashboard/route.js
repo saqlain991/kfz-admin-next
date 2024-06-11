@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers"; // Import cookies utility for server-side cookie handling
 
 export async function POST(request) {
-  console.log("inRoute");
+  // console.log("inRoute");
   try {
     const reqCookies = cookies(); // Get cookies from the request
     const token = reqCookies.get("token");

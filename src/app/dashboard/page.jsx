@@ -13,10 +13,12 @@ import BarGraph from "@/components/ui/GraphChart";
 import PieChart from "@/components/PieChart";
 import SplineAreaChart from "@/components/SplineAreaChart";
 import { Car, CreditCardIcon, ShoppingCart, Users } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const Dashboard = () => {
   const [error, setError] = useState("");
   const [homeCardIcons, setHomeCardIcons] = useState([]);
+  const router = useRouter()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -61,9 +63,11 @@ const Dashboard = () => {
           setHomeCardIcons(dashboardArray);
         } else {
           setError(response.msg);
+          router.push('/login')
         }
       } catch (err) {
         setError("An error occurred. Please try again.");
+        router.push('/login')
       }
     };
     fetchData();

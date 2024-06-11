@@ -1,3 +1,4 @@
+'use client'
 import React from "react";
 import {
   Card,
@@ -33,8 +34,17 @@ import Link from "next/link";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { Notification } from "./ui/notification";
 import { ModeToggle } from "./ModeToggle";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 const Header = () => {
+  const router = useRouter();
+
+  const logout = () => {
+    Cookies.remove("logged in");
+    router.push('/login');
+  };
+
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-6 lg:h-[60px] lg:px-6 mb-5 justify-end">
       {" "}
@@ -54,12 +64,16 @@ const Header = () => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            {/* <DropdownMenuLabel>My Account</DropdownMenuLabel> */}
+            <DropdownMenuItem>Login As: Admin</DropdownMenuItem>
             <DropdownMenuSeparator />
-            {/* <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuItem>Support</DropdownMenuItem> */}
-            {/* <DropdownMenuSeparator /> */}
-            <DropdownMenuItem>Logout</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Button 
+                type="button"
+                onClick={logout}
+              >
+                Logout
+              </Button>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

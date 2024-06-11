@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import { CustomPagination } from "@/components/pagination";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -41,82 +42,86 @@ import Image from "next/image";
 import React from "react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Separator } from "@/components/ui/separator";
 
 const CustomerPage = () => {
-  const customerData = [
-    {
-      customerName: "John Doe",
-      email: "johndoe@gmail.com",
-      phone: "+91 90909090",
-      createdAt: "2023-04-12",
-    },
-    {
-      customerName: "Jane Smith",
-      email: "janesmith@example.com",
-      phone: "+1 1234567890",
-      createdAt: "2023-04-13",
-    },
-    {
-      customerName: "Alice Johnson",
-      email: "alice.j@example.com",
-      phone: "+44 987654321",
-      createdAt: "2023-04-14",
-    },
-    {
-      customerName: "Bob Brown",
-      email: "bobbyb@example.com",
-      phone: "+61 55555555",
-      createdAt: "2023-04-15",
-    },
-    {
-      customerName: "Emily Wilson",
-      email: "emily.w@example.com",
-      phone: "+81 333333333",
-      createdAt: "2023-04-16",
-    },
-    {
-      customerName: "Michael Johnson",
-      email: "mike.j@example.com",
-      phone: "+1 5555555555",
-      createdAt: "2023-04-17",
-    },
-    {
-      customerName: "Sophia Lee",
-      email: "sophia.lee@example.com",
-      phone: "+82 123456789",
-      createdAt: "2023-04-18",
-    },
-    {
-      customerName: "William Miller",
-      email: "will.m@example.com",
-      phone: "+44 987654321",
-      createdAt: "2023-04-19",
-    },
-    {
-      customerName: "Olivia Davis",
-      email: "olivia.d@example.com",
-      phone: "+61 987654321",
-      createdAt: "2023-04-20",
-    },
-    {
-      customerName: "James Wilson",
-      email: "james.w@example.com",
-      phone: "+91 1234567890",
-      createdAt: "2023-04-21",
-    },
-  ];
-
-  // State for current page and items per page
+  const [customerData, setCustomerData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [blockAlertOpen, setBlockAlertOpen] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [alertMessage, setAlertMessage] = useState(null);
+  const [newCustomer, setNewCustomer] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: ""
+  });
   const itemsPerPage = 10;
 
-  // Calculate total pages
-  const totalPages = Math.ceil(customerData.length / itemsPerPage);
+  useEffect(() => {
+    fetchCustomerData();
+  }, []);
 
-  // Function to handle page change
+  const fetchCustomerData = async () => {
+    try {
+      const response = await axios.get("/api/customers");
+      setCustomerData(response.data);
+    } catch (error) {
+      setAlertMessage("Failed to fetch customer data.");
+    }
+  };
+
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
+
+  const handleEditClick = (customer) => {
+    setSelectedCustomer(customer);
+    setEditDialogOpen(true);
+  };
+
+  const handleBlockClick = (customer) => {
+    setSelectedCustomer(customer);
+    setBlockAlertOpen(true);
+  };
+
+  const handleConfirmBlock = async () => {
+    try {
+      await axios.post(`/api/customers/${selectedCustomer.id}/block`);
+      fetchCustomerData(); // Refresh data after block
+      setAlertMessage(`Customer ${selectedCustomer.customerName} blocked successfully.`);
+      setBlockAlertOpen(false);
+    } catch (error) {
+      setAlertMessage(`Failed to block customer ${selectedCustomer.customerName}.`);
+    }
+  };
+
+  const handleEditSave = async () => {
+    try {
+      await axios.put(`/api/customers/${selectedCustomer.id}`, selectedCustomer);
+      fetchCustomerData(); // Refresh data after edit
+      setAlertMessage(`Customer ${selectedCustomer.customerName} updated successfully.`);
+      setEditDialogOpen(false);
+    } catch (error) {
+      setAlertMessage(`Failed to update customer ${selectedCustomer.customerName}.`);
+    }
+  };
+
+  const handleAddCustomer = async () => {
+    try {
+      await axios.post("/api/customers", newCustomer);
+      fetchCustomerData(); // Refresh data after add
+      setAlertMessage(`Customer ${newCustomer.firstName} ${newCustomer.lastName} added successfully.`);
+      setNewCustomer({ firstName: "", lastName: "", email: "", phone: "" }); // Reset form
+    } catch (error) {
+      setAlertMessage("Failed to add customer.");
+    }
+  };
+
+  const totalPages = Math.ceil(customerData.length / itemsPerPage);
 
   return (
     <div>
@@ -167,18 +172,62 @@ const CustomerPage = () => {
                     Export
                   </span>
                 </Button>
-                <Link href={"/dashboard/customer/add-customer"}>
-                  <Button size="sm" variant="outline" className="h-7 gap-1">
-                    <PlusCircle className="h-3.5 w-3.5" />
-                    <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                      Add Customer
-                    </span>
-                  </Button>
-                </Link>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button size="sm" variant="outline" className="h-7 gap-1">
+                      <PlusCircle className="h-3.5 w-3.5" />
+                      <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                        Add Customer
+                      </span>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader className="text-2xl">Add Customer</DialogHeader>
+                    <DialogDescription>Here you can add Customer</DialogDescription>
+                    <Separator></Separator>
+                    <div >
+                      <div className="py-2">
+                        <label htmlFor="first-name"> First Name</label>
+                        <Input
+                          placeholder="Jack "
+                          value={newCustomer.firstName}
+                          onChange={(e) => setNewCustomer({ ...newCustomer, firstName: e.target.value })}
+                        />
+                      </div>
+                      <div className="py-2">
+                        <label htmlFor="last-name"> Last Name</label>
+                        <Input
+                          placeholder="Warner"
+                          value={newCustomer.lastName}
+                          onChange={(e) => setNewCustomer({ ...newCustomer, lastName: e.target.value })}
+                        />
+                      </div>
+                      <div className="py-2">
+                        <label htmlFor="email"> Email</label>
+                        <Input
+                          placeholder="example@email.com"
+                          value={newCustomer.email}
+                          onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })}
+                        />
+                      </div>
+                      <div className="py-2">
+                        <label htmlFor="phone"> Phone</label>
+                        <Input
+                          placeholder="+919090909090"
+                          value={newCustomer.phone}
+                          onChange={(e) => setNewCustomer({ ...newCustomer, phone: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button onClick={handleAddCustomer}>Save</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
             <TabsContent value="all">
-              <Card className="h-[600px]" x-chunk="dashboard-06-chunk-0 ">
+              <Card className="h-[600px]" x-chunk="dashboard-06-chunk-0">
                 <CardContent>
                   <ScrollArea className="h-[480px] w-full overflow-y-auto">
                     <Table>
@@ -199,7 +248,6 @@ const CustomerPage = () => {
                           <TableHead style={{ whiteSpace: "nowrap" }}>
                             Created at
                           </TableHead>
-
                           <TableHead style={{ whiteSpace: "nowrap" }}>
                             Action
                           </TableHead>
@@ -225,15 +273,15 @@ const CustomerPage = () => {
                               <TableCell className="font-medium p-2">
                                 {cData.phone}
                               </TableCell>
-
                               <TableCell className="font-medium p-2">
                                 {cData.createdAt}
                               </TableCell>
-
                               <TableCell>
                                 <div className=" flex flex-row gap-2">
-                                  <Button variant="outline">Edit</Button>
-                                  <Button variant="outline">Block</Button>
+                                  <Button variant="outline" onClick={() => handleEditClick(cData)}>Edit</Button>
+                                  <Button variant="outline" onClick={() => handleBlockClick(cData)}>
+                                    {cData.status === "blocked" ? "Unblock" : "Block"}
+                                  </Button>
                                 </div>
                               </TableCell>
                             </TableRow>
@@ -255,7 +303,7 @@ const CustomerPage = () => {
                         ? customerData.length
                         : currentPage * itemsPerPage}
                     </strong>{" "}
-                    of <strong>{customerData.length}</strong> orders
+                    of <strong>{customerData.length}</strong> customers
                   </div>
                 </CardFooter>
               </Card>
@@ -263,6 +311,85 @@ const CustomerPage = () => {
           </Tabs>
         </main>
       </h1>
+      
+      {/* Edit Customer Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>Edit Customer</DialogHeader>
+          {selectedCustomer && (
+            <div>
+              <Input
+                placeholder="First Name"
+                value={selectedCustomer.firstName}
+                onChange={(e) =>
+                  setSelectedCustomer({
+                    ...selectedCustomer,
+                    firstName: e.target.value,
+                  })
+                }
+              />
+              <Input
+                placeholder="Last Name"
+                value={selectedCustomer.lastName}
+                onChange={(e) =>
+                  setSelectedCustomer({
+                    ...selectedCustomer,
+                    lastName: e.target.value,
+                  })
+                }
+              />
+              <Input
+                placeholder="Email"
+                value={selectedCustomer.email}
+                onChange={(e) =>
+                  setSelectedCustomer({
+                    ...selectedCustomer,
+                    email: e.target.value,
+                  })
+                }
+              />
+              <Input
+                placeholder="Phone"
+                value={selectedCustomer.phone}
+                onChange={(e) =>
+                  setSelectedCustomer({
+                    ...selectedCustomer,
+                    phone: e.target.value,
+                  })
+                }
+              />
+            </div>
+          )}
+          <DialogFooter>
+            <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleEditSave}>Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Block Alert Dialog */}
+      <AlertDialog open={blockAlertOpen} onOpenChange={setBlockAlertOpen}>
+        <AlertDialogTrigger asChild></AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>Confirm Block</AlertDialogHeader>
+          <div>Are you sure you want to block this customer?</div>
+          <AlertDialogFooter>
+            <Button onClick={() => setBlockAlertOpen(false)}>Cancel</Button>
+            <Button onClick={handleConfirmBlock}>Confirm</Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Alert Message */}
+      {alertMessage && (
+        <div
+          className={`alert ${alertMessage.includes("Failed") ? "alert-error" : "alert-success"}`}
+          role="alert"
+        >
+          {alertMessage}
+          <Button onClick={() => setAlertMessage(null)}>Close</Button>
+        </div>
+      )}
     </div>
   );
 };
